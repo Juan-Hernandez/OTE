@@ -36,7 +36,6 @@ function modeldata(model::OTEmodel,lenght_sol::Int64)
 		# 1.1 Productivities and States:
 		θw  = model.states[1,i]
 		e 	= model.states[2,i]
-		ϕe	= model.states[3,i]
 		u	= model.states[4,i]
 		μ	= model.states[5,i]
 		L	= model.states[6,i]
@@ -53,6 +52,8 @@ function modeldata(model::OTEmodel,lenght_sol::Int64)
 		# 1.4 Values for the planner:
 		Vw = (utilit*u^ϕ - λ*u) + ω*l*θw - λ*χ/(1.0+ψ)*l^(1.0+ψ);
         Ve = (utilit*u^ϕ - λ*u) + λ*e*n^α - λ*β/(1.0+σ)*z^(1.0+σ) - ω*( n-ς );
+		ϕe = model.states[3,i]*( n^α*(1.0-β*z^σ) ) - Ve*model.modist.he(θw, e);
+		model.states[3,i] = ϕe
 
 		# 1.4 Taxes Liabilities (also includes the tax base):
 			# 1.4.1 Tax bases (Recall that for Tc we need to have the value of Tn):

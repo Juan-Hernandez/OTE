@@ -27,7 +27,7 @@ ecopar=EconomicParameters(
 
 # 2. Distribution parameters
 # 2.1 Type of distribution
-uniform = false	# ::Bool	# Indicator of uniform distributions.
+uniform = true	# ::Bool	# Indicator of uniform distributions.
 if uniform # Uniform case
 	# 2.2 Distribution moments
 	μ_w=10.0	# ::Float64	# Mean of worker's ability
@@ -73,8 +73,9 @@ compar=ComputationParameters(
 	1e-5,	# reltol::Float64
 	false,	# verbosebool::Bool
 	false,	# debugbool::Bool
-	 Rosenbrock23()	# alg::T where T<:OrdinaryDiffEqAlgorithm
-	# Tsit5()		# alg::T where T<:OrdinaryDiffEqAlgorithm
+	# Rosenbrock23()	# alg::T where T<:OrdinaryDiffEqAlgorithm
+	 Tsit5()		# alg::T where T<:OrdinaryDiffEqAlgorithm
+	# RK4()
 	) # Close constructor call
 
 # 4. Initial guess for prices and final states/costates
@@ -115,8 +116,8 @@ else #For log-normal case
 end #end if
 
 ew_u	=   dispar.θ_e_u*(1.0-0.007)
-ϕ_e_u	=	NaN # Ve*he @ ew_u (filled after entrepreneurs' problem)
+New_State_u	=	NaN # Ve*he @ ew_u (filled after entrepreneurs' problem)
 μ_u		=   0.0 # Fixed
 L_u		=   0.0	# Fixed
 Y_u		=   0.0	# Fixed
-finalstateguess=[ew_u, ϕ_e_u, u_u, μ_u, L_u, Y_u]
+finalstateguess=[ew_u, New_State_u, u_u, μ_u, L_u, Y_u]

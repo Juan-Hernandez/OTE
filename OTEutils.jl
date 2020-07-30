@@ -14,7 +14,7 @@ using ForwardDiff
 # 1.2.1 Extend prevfloat for duals
 	Base.nextfloat(d::ForwardDiff.Dual{T,V,N}) where {T,V,N} = ForwardDiff.Dual{T}(nextfloat(d.value), d.partials)
 	Base.prevfloat(d::ForwardDiff.Dual{T,V,N}) where {T,V,N} = ForwardDiff.Dual{T}(prevfloat(d.value), d.partials)
-	Base.one(irr::AbstractIrrational) = one(irr*1) 
+	Base.one(irr::AbstractIrrational) = one(irr*1)
 # 1.3 Saving output
 using DataFrames
 using CSV
@@ -32,7 +32,8 @@ include("fullrungekutta!.jl")
 include("entderivatives!.jl")
 include("entcontrols!.jl")
 include("globalderivatives!.jl")
-include("globalcontrols!.jl")
+#include("globalcontrols!.jl")
+include("globalcontrols1!.jl")
 
 # 4 Results functions
 # 4.0 Function to solve integrals from propositions and taxes.
