@@ -26,7 +26,8 @@ function modeldata(model::OTEmodel,lenght_sol::Int64)
 	controls_full = Array{Float64,2}(undef,fullsize,2); #The matrix for controls full information
 	debug = Array{Float64,2}(undef,fullsize,7); #The matrix for debug
 	Propositions = Array{Float64}(undef,fullsize,7) #Order: Proposition 1, Proposition 2, Proposition 3
-	for i in [MarginalTaxes,taxliabilities,controls_full,debug,Propositions]
+	FOCs = Array{Float64}(undef,fullsize,3)
+	for i in [MarginalTaxes,taxliabilities,controls_full,debug,Propositions,FOCs]
 		fill!(i,NaN);
 	end #end for
 
@@ -110,7 +111,12 @@ function modeldata(model::OTEmodel,lenght_sol::Int64)
 		debug[i,4] = n^α*(1.0-β*z^σ); #u_e'
 		debug[i,5] = ω*ς+(utilit*u^ϕ-λ*u)+ϕe/debug[i,2]; #A
 		debug[i,6] = -(1.0-α)/α*ω*controls_full[i,1]; #A if z is 0 and n_full_info
-		debug[i,7] = λ*e*controls_full[i,1]^α - ω*(controls_full[i,1]-ς); #Max posible evasion
+		debug[i,7] = e*controls_full[i,1]^α - ω/λ*(controls_full[i,1]-ς); #Max posible evasion
+
+		#Solving the FOCs:
+		FOCs[i,1] = p/n*α*debug[i,2]*( -(1.0-α)/α*ω*n + λ*β/(1.0+σ)*z^(1.0+σ) - debug[i,5] )
+		FOCs[i,2] = σ*β*z^(σ-1.0)/(1.0-β*z^σ)*p*debug[i,2]*( λ*e*n^α - ω*n - λ/σ*z*( 1.0 - β/(1.0+σ)*z^σ ) + debug[i,5] )
+		FOCs[i,3] = l^ψ*( χ/θw*(1.0+ψ)*μ - λ*χ*debug[i,1] ) + ω*θw*debug[i,1] + (1.0+ψ)*p/l*debug[i,2]*( λ*e*n^α - ω*n - λ*β/(1.0+σ)*z^(1.0+σ) + debug[i,5] )
 	end # end for
 
 	#Now we solve the integrals in reverse
@@ -168,11 +174,11 @@ function modeldata(model::OTEmodel,lenght_sol::Int64)
 
 # 2. Define our dataframe:
 	Results_DF = DataFrame( hcat(transpose(model.states),transpose(model.controls),MarginalTaxes,
-							taxliabilities, Propositions, controls_full, debug),
+							taxliabilities, Propositions, controls_full, debug, FOCs),
 							[:θw, :θe, :ϕe, :u, :μ, :L, :Y, :n, :z, :l, :p, :Tn′, :Tc′, :Tl′,
 							:baseTn, :baseTc, :baseTl, :Tn, :Tc, :Tl, :Prop1LSDebug, :Prop1RS1, :Prop1RS2,
 							:Prop2LS1, :Prop2RS1, :Prop3LS2, :Prop3RS1, :nfull, :lfull,
-							:hw, :he, :uw′, :ue′, :A, :Afull, :MaxEvasion] )
+							:hw, :he, :uw′, :ue′, :A, :Afull, :MaxEvasion, :FOCn, :FOCz, :FOCl] )
 	Results_DF = Results_DF[first_sol_Global:fullsize,:]
 	return Results_DF
 

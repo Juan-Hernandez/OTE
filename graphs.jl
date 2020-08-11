@@ -7,8 +7,8 @@ function graphs_MainGlobal(data::DataFrame, dir::AbstractString)
 	original_dir = pwd() #To save the original directory.
 	cd(dir)
 	# 0.3. Define the sizes of the global and entrepreneur problem for the graphs:
-	globalsize = model.compar.globalsize
-	fullsize   = model.compar.entrepsize+globalsize-1
+	(fullsize,) = size(data)
+	globalsize = fullsize-model.compar.entrepsize
 
 # 1. Graphs for the states:
 	# 1.1. Define the number of states:
@@ -113,8 +113,8 @@ function graphs_MainGloAndEnt(data::DataFrame, dir::AbstractString)
 	original_dir = pwd() #To save the original directory.
 	cd(dir)
 	# 0.3. Define the sizes of the global and entrepreneur problem for the graphs:
-	globalsize = model.compar.globalsize
-	fullsize   = model.compar.entrepsize+globalsize-1
+	(fullsize,) = size(data)
+	globalsize = fullsize-model.compar.entrepsize
 
 # 1. Graphs for the states:
 	# 1.1. Define the number of states:
@@ -197,8 +197,8 @@ function graphs_debug(data::DataFrame, dir::AbstractString)
 	original_dir = pwd() #To save the original directory.
 	cd(dir)
 	# 0.3. Define the sizes of the global and entrepreneur problem for the graphs:
-	globalsize = model.compar.globalsize
-	fullsize   = model.compar.entrepsize+globalsize-1
+	(fullsize,) = size(data)
+	globalsize = fullsize-model.compar.entrepsize
 
 # 1. Graphs for the marginal utilities:
 	fig, utilities=plt.subplots(1,2)
@@ -231,27 +231,30 @@ function graphs_debug(data::DataFrame, dir::AbstractString)
 	#Global problem
 		#Value for max possible evasion:
 		Z_graphs[1,1].plot(data[1:globalsize,:].:θw, data[1:globalsize,:].:MaxEvasion)
-		Z_graphs[1,1].set(ylabel="λen^α - ω*(n-̅m)",xlabel="θw")
+		Z_graphs[1,1].set(ylabel="e*n^α - ω/λ*(n-̅m)",xlabel="θw")
 		#Evasion in model:
 		Z_graphs[1,2].plot(data[1:globalsize,:].:θw, data[1:globalsize,:].:z)
 		Z_graphs[1,2].set(ylabel="z",xlabel="θw")
 		#Combined:
 		Z_graphs[1,3].plot(data[1:globalsize,:].:θw, data[1:globalsize,:].:MaxEvasion, data[1:globalsize,:].:θw, data[1:globalsize,:].:z)
 		Z_graphs[1,3].set(xlabel="θw")
-		Z_graphs[1,3].legend(["λen^α - ωn","z"],loc="upper left")
+		Z_graphs[1,3].legend(["e*n^α - ω/λ*(n-̅m)","z"],loc="upper left")
 
 	#Entrepreneurs problem
 		#Value for max possible evasion:
+		Z_graphs[2,1].set(title = "Entrepreneurs' problem")
 		Z_graphs[2,1].plot(data[globalsize:fullsize,:].:θe, data[globalsize:fullsize,:].:MaxEvasion)
-		Z_graphs[2,1].set(ylabel="λθen^α - ω*(n-̅m)",xlabel="θe")
+		Z_graphs[2,1].set(ylabel="θe*n^α - ω/λ*(n-̅m)",xlabel="θe")
 		#Evasion in model:
+		Z_graphs[2,2].set(title = "Entrepreneurs' problem")
 		Z_graphs[2,2].plot(data[globalsize:fullsize,:].:θe, data[globalsize:fullsize,:].:z)
 		Z_graphs[2,2].set(ylabel="z",xlabel="θe")
 		#Combined:
+		Z_graphs[2,3].set(title = "Entrepreneurs' problem")
 		Z_graphs[2,3].plot(data[globalsize:fullsize,:].:θe, data[globalsize:fullsize,:].:MaxEvasion,
 						   data[globalsize:fullsize,:].:θe, data[globalsize:fullsize,:].:z)
-		Z_graphs[2,3].set(ylabel="λen^α - ω*(n-̅m) or z", xlabel="θe")
-		plt.legend(["λen^α - ωn","z"],loc="upper right")
+		Z_graphs[2,3].set(ylabel="θe*n^α - ω/λ*(n-̅m) or z", xlabel="θe")
+		plt.legend(["θe*n^α - ω/λ*(n-̅m)","z"],loc="upper right")
 
 	savefig("Z_Debug.png")
 
@@ -314,7 +317,7 @@ function graphs_OtherResults(data::DataFrame, dir::AbstractString)
 	prop3.plot(data[1:globalsize,:].:θw, data[1:globalsize,:].:Prop3LS2)
 	prop3.plot(data[1:globalsize,:].:θw, data[1:globalsize,:].:Prop3RS1)
 	prop3.plot(data[1:globalsize,:].:θw, repeat([data[globalsize, :μ]],globalsize) )
-	prop3.legend(["εz z/n^α he", "1/λ [Ve-Vw] g 1/ue'", "∫( 1-ϕ/λ uw^ϕ-1 ) he". "μe(θw_u)"],loc="upper right")
+	prop3.legend(["εz z/n^α he", "1/λ [Ve-Vw] g 1/ue'", "∫( 1-ϕ/λ uw^ϕ-1 ) he", "μe(θw_u)"],loc="upper right")
 	prop3.set(xlabel="θw")
 
 	savefig("Propositions.png")
