@@ -18,7 +18,7 @@ function fullrungekutta!(model::OTEmodel)
 	lenght_sol::Int64=0
 # 0.3 Auxiliary functions
 	Ve(nvar,zvar,evar,uvar)= ( model.ecopar.utilit*uvar^model.ecopar.ϕ + model.prices[1]*(evar*nvar^α
-			- β/(1.0+σ)*zvar^(1.0+σ) - uvar) - model.prices[2]*(nvar-model.ecopar.ς) )
+	 		- β/(1.0+σ)*zvar^(1.0+σ) - uvar) - model.prices[2]*(nvar-model.ecopar.ς) )
 
 # 1. Define parameters and callback setm
 # 1.1 Build parameter struct

@@ -26,7 +26,7 @@ function modeldata(model::OTEmodel,lenght_sol::Int64)
 	controls_full = Array{Float64,2}(undef,fullsize,2); #The matrix for controls full information
 	debug = Array{Float64,2}(undef,fullsize,7); #The matrix for debug
 	Propositions = Array{Float64}(undef,fullsize,7) #Order: Proposition 1, Proposition 2, Proposition 3
-	FOCs = Array{Float64}(undef,fullsize,3)
+	FOCs = Array{Float64}(undef,fullsize,4)
 	for i in [MarginalTaxes,taxliabilities,controls_full,debug,Propositions,FOCs]
 		fill!(i,NaN);
 	end #end for
@@ -51,8 +51,9 @@ function modeldata(model::OTEmodel,lenght_sol::Int64)
 		MarginalTaxes[i,3] = ( θw*ω-λ*χ*l^ψ )/(θw*ω) #Tl'
 		# 1.4 Values for the planner:
 		Vw = (utilit*u^ϕ - λ*u) + ω*l*θw - λ*χ/(1.0+ψ)*l^(1.0+ψ);
-        Ve = (utilit*u^ϕ - λ*u) + λ*e*n^α - λ*β/(1.0+σ)*z^(1.0+σ) - ω*( n-ς );
+        Ve =  utilit*u^ϕ + λ*( e*n^α - β/(1.0+σ)*z^(1.0+σ) - u ) - ω*( n-ς );
 		ϕe = model.states[3,i]*( n^α*(1.0-β*z^σ) ) - Ve*model.modist.he(θw, e);
+		FOCs[i,4] = model.states[3,i]
 		model.states[3,i] = ϕe
 
 		# 1.4 Taxes Liabilities (also includes the tax base):
@@ -174,12 +175,20 @@ function modeldata(model::OTEmodel,lenght_sol::Int64)
 	end # end for
 
 # 2. Define our dataframe:
+	# Results_DF = DataFrame( hcat(transpose(model.states),transpose(model.controls),MarginalTaxes,
+	# 						taxliabilities, Propositions, controls_full, debug),
+	# 						[:θw, :θe, :ϕe, :u, :μ, :L, :Y, :n, :z, :l, :p, :Tn′, :Tc′, :Tl′,
+	# 						:baseTn, :baseTc, :baseTl, :Tn, :Tc, :Tl, :Prop1LSDebug, :Prop1RS1, :Prop1RS2,
+	# 						:Prop2LS1, :Prop2RS1, :Prop3LS2, :Prop3RS1, :nfull, :lfull,
+	# 						:hw, :he, :uw′, :ue′, :A, :Afull, :MaxEvasion] )
+
 	Results_DF = DataFrame( hcat(transpose(model.states),transpose(model.controls),MarginalTaxes,
 							taxliabilities, Propositions, controls_full, debug, FOCs),
 							[:θw, :θe, :ϕe, :u, :μ, :L, :Y, :n, :z, :l, :p, :Tn′, :Tc′, :Tl′,
 							:baseTn, :baseTc, :baseTl, :Tn, :Tc, :Tl, :Prop1LSDebug, :Prop1RS1, :Prop1RS2,
 							:Prop2LS1, :Prop2RS1, :Prop3LS2, :Prop3RS1, :nfull, :lfull,
-							:hw, :he, :uw′, :ue′, :A, :Afull, :MaxEvasion, :FOCn, :FOCz, :FOCl] )
+							:hw, :he, :uw′, :ue′, :A, :Afull, :MaxEvasion, :FOCn, :FOCz, :FOCl, :NewState] )
+
 	Results_DF = Results_DF[first_sol_Global:fullsize,:]
 	return Results_DF
 

@@ -2,6 +2,7 @@ function globalcontrols!(controls::AbstractArray{T,1}, ss::Array{T,1}, prices::A
 	# INPUT: control vector, state vector and parameters
 	# MODIFIES: control vector
 	debugbool::Bool=false
+	verbosebool::Bool=true
 # 1.0 Preallocating
 	corner_nn::T=NaN
 	corner_zz::T=NaN
@@ -30,19 +31,12 @@ function globalcontrols!(controls::AbstractArray{T,1}, ss::Array{T,1}, prices::A
 	z_opt(nvar)      = pa.σ/λ*nvar^pa.α/h_e*New_A;
 	nfoc_at_zopt(nvar) = nfoc( nvar, z_opt(nvar) );
 	den_p(nvar,zvar)   = θ*nvar^pa.α*(1.0-pa.β*zvar^pa.σ)
-	Ve(nvar,zvar) = ( pa.utilit*u^pa.ϕ + λ*(e*nvar^pa.α - pa.β/(1.0+pa.σ)*zvar^(1.0+pa.σ) - u) - ω*(nvar-pa.ς) )
-	ϕe(nvar,zvar) = New_A*( nvar^pa.α*(1.0-pa.β*zvar^pa.σ) ) - Ve(nvar,zvar)*h_e
-
-	objective(lvar, nvar, pvar, zvar) = ( pa.utilit*u^pa.ϕ*(h_w+pvar*h_e) + μ*pa.χ/θ*lvar^(1.0+pa.ψ)
-										+ λ*pvar*h_e*( e*nvar^pa.α - pa.β/(1.0+pa.σ)*zvar^(1.0+pa.σ) - u )
-										- λ*h_w*( u + pa.χ/(1.0+pa.ψ)*lvar^(1.0+pa.ψ) )
-										+ ω*(θ*lvar*h_w-(nvar-pa.ς)*pvar*h_e) + ϕe(nvar,zvar)*pvar ) # Hamiltonian. big parenthesis needed for multline
 
 # 2 Define cases and solve
 # 2.0 We solve first l, as it doesn't depend on other variables:
 den_l = ( λ*pa.χ*h_w - pa.χ/θ*(1.0+pa.ψ)*( μ + New_A) )
 den_l <= 0.0 ? (controls[3]=ln_max*h_w) : (controls[3]=(ω*θ*h_w/den_l)^(1.0/pa.ψ) )
-verbosebool && println("l = ", controls[3])
+verbosebool && println("l = ", controls[3], " den_l = ", den_l)
 
 # 2.1 : he = 0
 	if h_e<1e-10 # h_e=0.0
@@ -70,7 +64,7 @@ verbosebool && println("l = ", controls[3])
 	if New_A*controls[3] <= 0.0
 		verbosebool && println("Case 2: (Ve*he+ϕe)/̇ue ≦ 0.")
 		controls[2] = 0.0 # z_foc always negative
-		controls[1] = (λ/ω*pa.α*e - pa.α/ω/h_e*New_A)^(1.0/(1.0-pa.α)); # Interior solution for n in z=0.0
+		controls[1] = (λ/ω*pa.α*e - pa.α/ω*New_A/h_e)^(1.0/(1.0-pa.α)); # Interior solution for n in z=0.0
 		controls[4] = (pa.χ*controls[3]^(1.0+pa.ψ))/den_p(controls[1],controls[2])
 
 		#Final Output:
@@ -90,7 +84,7 @@ verbosebool && println("l = ", controls[3])
 
 		z_candidate1 = z_opt(controls[1])
 		z_candidate2 = z_u
-		z_candidate3 = λ*e*controls[1]^pa.α
+		z_candidate3 = e*controls[1]^pa.α - ω/λ*(controls[1]-pa.ς)
 		controls[2]  = min(z_candidate1, z_candidate2, z_candidate3)
 		controls[4] = (pa.χ*controls[3]^(1.0+pa.ψ))/den_p(controls[1],controls[2])
 

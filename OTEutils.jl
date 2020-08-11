@@ -28,12 +28,11 @@ include("definitions.jl")
 # 3.1 Initialization
 include("initializeOTEmodel!.jl")
 # 3.2 Runge-Kutta solver functions
-include("fullrungekutta!.jl")
 include("entderivatives!.jl")
 include("entcontrols!.jl")
+include("fullrungekutta!.jl")
+include("globalcontrols!.jl")
 include("globalderivatives!.jl")
-#include("globalcontrols!.jl")
-include("globalcontrols1!.jl")
 
 # 4 Results functions
 # 4.0 Function to solve integrals from propositions and taxes.
