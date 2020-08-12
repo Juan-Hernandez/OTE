@@ -18,7 +18,7 @@ ecopar=EconomicParameters(
 	0.12873,# δ::Float64	# Entrepreners' informal demand scale parameter
 	0.7341,	# γ::Float64	# Entrepreneurs' informal demand elasticity
 	# 1.4 Planner's parameters
-	false,	# utilit::Bool	# Indicator of utilitarian planner
+	true,	# utilit::Bool	# Indicator of utilitarian planner
 	0.1,	# ϕ::Float64 	# Concave utilitarian parameter
 	0.15 	# G::Float64	# Expenditure needs
 	)	# Close constructor call
@@ -40,25 +40,36 @@ if uniform # Uniform case
 	θ_e_u=μ_e+((12.0^0.5)/2.0)*(σ2_e^0.5)	# ::Float64	# Upper bound of entrepreneurs's ability
 else # Log-Normal case
 	#Define the bounds for the distributions: we need to limit the normal distribution
-	constant_w_l = 5.0e-2  # ::Float64	# Percentage of worker's distribution we are not taking in lower bound
-	constant_w_u = 1.0-0.1 # ::Float64	# Percentage of worker's distribution we are not taking in upper bound
-    constant_e_l = 5.0e-2  # ::Float64	# Percentage of entrepreneur's distribution we are not taking in lower bound
-    constant_e_u = 1.0-0.1 # ::Float64	# Percentage of entrepreneur's distribution we are not taking in upper bound
-	# 2.2 Distribution moments
-	μ_w  = 1.7626	# ::Float64	# Mean of worker's ability
-	μ_e  = 1.2528	# ::Float64	# Mean of entrepreneur's ability
-	σ2_w = 1.0921	# ::Float64	# Variance of worker's ability
-	σ2_e = 1.1675	# ::Float64	# Varaince of entrepreneur's ability
-	σ_we = 0.0		# ::Float64	# Covariance of abilities.
+	# constant_w_l = 5.0e-2  # ::Float64	# Percentage of worker's distribution we are not taking in lower bound
+	# constant_w_u = 1.0-0.1 # ::Float64	# Percentage of worker's distribution we are not taking in upper bound
+    # constant_e_l = 5.0e-2  # ::Float64	# Percentage of entrepreneur's distribution we are not taking in lower bound
+    # constant_e_u = 1.0-0.1 # ::Float64	# Percentage of entrepreneur's distribution we are not taking in upper bound
+	# # 2.2 Distribution moments
+	# μ_w  = 1.7626	# ::Float64	# Mean of worker's ability
+	# μ_e  = 1.2528	# ::Float64	# Mean of entrepreneur's ability
+	# σ2_w = 1.0921	# ::Float64	# Variance of worker's ability
+	# σ2_e = 1.1675	# ::Float64	# Varaince of entrepreneur's ability
+	# σ_we = 0.0		# ::Float64	# Covariance of abilities.
+	# # 2.3 Distribution support
+	# log_θ_w_l = quantile(Normal(μ_w,σ2_w^0.5),constant_w_l); # ::Float64 # Lower bound of the logarithmic worker's distribution
+	# θ_w_l     = exp(log_θ_w_l) 				# ::Float64	# Lower bound of worker's ability
+	# log_θ_e_l = quantile(Normal(μ_e,σ2_e^0.5),constant_e_l); # ::Float64 # Lower bound of the logarithmic entrepreneur's distribution
+	# θ_e_l     = exp(log_θ_e_l) 				# ::Float64	# Lower bound of entrepreneur's ability
+	# log_θ_w_u = quantile(Normal(μ_w,σ2_w^0.5),constant_w_u); # ::Float64 # Lower bound of the logarithmic worker's distribution
+	# θ_w_u     = exp(log_θ_w_u) 				# ::Float64	# Lower bound of worker's ability
+	# log_θ_e_u = quantile(Normal(μ_e,σ2_e^0.5),constant_e_u); # ::Float64 # Lower bound of the logarithmic entrepreneur's distribution
+	# θ_e_u     = exp(log_θ_e_u) 				# ::Float64	# Lower bound of entrepreneur's ability
+
+	μ_w=10.0	# ::Float64	# Mean of worker's ability
+	μ_e=10.0	# ::Float64	# Mean of entrepreneur's ability
+	σ2_w=6.0	# ::Float64	# Variance of worker's ability
+	σ2_e=6.0	# ::Float64	# Varaince of entrepreneur's ability
+	σ_we=0.0	# ::Float64	# Covariance of abilities.
 	# 2.3 Distribution support
-	log_θ_w_l = quantile(Normal(μ_w,σ2_w^0.5),constant_w_l); # ::Float64 # Lower bound of the logarithmic worker's distribution
-	θ_w_l     = exp(log_θ_w_l) 				# ::Float64	# Lower bound of worker's ability
-	log_θ_e_l = quantile(Normal(μ_e,σ2_e^0.5),constant_e_l); # ::Float64 # Lower bound of the logarithmic entrepreneur's distribution
-	θ_e_l     = exp(log_θ_e_l) 				# ::Float64	# Lower bound of entrepreneur's ability
-	log_θ_w_u = quantile(Normal(μ_w,σ2_w^0.5),constant_w_u); # ::Float64 # Lower bound of the logarithmic worker's distribution
-	θ_w_u     = exp(log_θ_w_u) 				# ::Float64	# Lower bound of worker's ability
-	log_θ_e_u = quantile(Normal(μ_e,σ2_e^0.5),constant_e_u); # ::Float64 # Lower bound of the logarithmic entrepreneur's distribution
-	θ_e_u     = exp(log_θ_e_u) 				# ::Float64	# Lower bound of entrepreneur's ability
+	θ_w_l=μ_w-((12.0^0.5)/2.0)*(σ2_w^0.5)	# ::Float64	# Lower bound of worker's ability
+	θ_w_u=μ_w+((12.0^0.5)/2.0)*(σ2_w^0.5)	# ::Float64	# Upper bound of worker's ability
+	θ_e_l=μ_e-((12.0^0.5)/2.0)*(σ2_e^0.5)	# ::Float64	# Lower bound of entrepreneurs's ability
+	θ_e_u=μ_e+((12.0^0.5)/2.0)*(σ2_e^0.5)	# ::Float64	# Upper bound of entrepreneurs's ability
 end # end if
 # 2.4 Constructor call
 dispar=DistributionParameters(uniform, μ_w, μ_e, σ2_w, σ2_e, σ_we, θ_w_l, θ_w_u, θ_e_l, θ_e_u )
@@ -100,6 +111,17 @@ u_u =   3000.0
 ω_bar	=   0.76999
 priceguess= [λ_bar, ω_bar]
 ew_u	=   dispar.θ_e_u*(1.0-0.23)
+#mbar=10.0: ω_min=1.342555  ω_max=1.339170  -- ω_max_max=1.343049 e(θw_lb)=θe_lb (but bunching not addressed)
+u_u		=   770
+λ_bar	=   0.0004571
+ω_bar	=   1.33749*λ_bar
+ew_u	=   dispar.θ_e_u*(1.0-0.007)
+
+# u_u		=   640.7
+# λ_bar	=   1.0
+# ω_bar	=   1.34318
+# priceguess= [λ_bar, ω_bar]
+# ew_u	=   dispar.θ_e_u*(1.0-0.007)
 #mbar=10.0: ω_min=1.342555  ω_max=1.339170  -- ω_max_max=1.343049 e(θw_lb)=θe_lb (but bunching not addressed)
 
 finalstateguess=[ew_u, New_State_u, u_u, μ_u, L_u, Y_u]
