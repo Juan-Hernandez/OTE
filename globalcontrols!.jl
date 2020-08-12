@@ -2,14 +2,13 @@ function globalcontrols!(controls::AbstractArray{T,1}, ss::Array{T,1}, prices::A
 	# INPUT: control vector, state vector and parameters
 	# MODIFIES: control vector
 	debugbool::Bool=false
-	verbosebool::Bool=true
 # 1.0 Preallocating
-	corner_nn::T=NaN
-	corner_zz::T=NaN
-	corner_ll::T=NaN
-	corner_pp::T=NaN
-	corner_hamiltonian::T=NaN
-	max_hamiltonian::T=-Inf
+	# corner_nn::T=NaN
+	# corner_zz::T=NaN
+	# corner_ll::T=NaN
+	# corner_pp::T=NaN
+	# corner_hamiltonian::T=NaN
+	# max_hamiltonian::T=-Inf
 # 1.1 Extracting
 	θ::T   =ss[1]
 	e::T   =ss[2]
@@ -95,9 +94,9 @@ verbosebool && println("l = ", controls[3], " den_l = ", den_l)
 		#println("Bisection: signs equal solving an interior n --> Cannot solve.")
 
 		# 2.2.2 We evaluate the corner solution for n = ̄m:
-			corner_nn = pa.ς
-			corner_zz = z_opt(corner_nn)
-			corner_pp = (pa.χ*controls[3]^(1.0+pa.ψ))/den_p(corner_nn,corner_zz);
+			controls[1] = pa.ς
+			controls[2] = z_opt(controls[1])
+			controls[4] = (pa.χ*controls[3]^(1.0+pa.ψ))/den_p(controls[1],controls[2]);
 
 			#corner_hamiltonian = objective(controls[3],corner_nn,corner_pp,corner_zz)
 			#verbosebool && println("Corner1 Hamiltonian = ", corner_hamiltonian)

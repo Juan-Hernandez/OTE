@@ -90,10 +90,16 @@ New_State_u	=	NaN # Ve*he @ ew_u (filled after entrepreneurs' problem)
 L_u		=   0.0	# Fixed
 Y_u		=   0.0	# Fixed
 
-ϕ_e_u =   3000.0
-λ_bar =   1.0
-ω_bar =   1.2
+u_u =   3000.0
+λ_bar	=   0.0004571
+ω_bar	=   1.33749*λ_bar
 priceguess= [λ_bar, ω_bar]
+
+u_u =   3000.0
+λ_bar	=   1.0
+ω_bar	=   0.76999
+priceguess= [λ_bar, ω_bar]
+ew_u	=   dispar.θ_e_u*(1.0-0.23)
 #mbar=10.0: ω_min=1.342555  ω_max=1.339170  -- ω_max_max=1.343049 e(θw_lb)=θe_lb (but bunching not addressed)
 
 finalstateguess=[ew_u, New_State_u, u_u, μ_u, L_u, Y_u]

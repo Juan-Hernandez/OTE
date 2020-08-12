@@ -34,7 +34,6 @@ function globalderivatives!(du,u,pa,θ)
 	end
 
 # 4. Find optimal controls
-	println("ss = ", ss," ss = ", ForwardDiff.value.(ss))
 	(n, z, l, p) = globalcontrols(ss, pa.prices, pa.ecopar, pa.compar.debugbool)
 	any(isnan,(n, z, l, p)) && error("Function globalderivatives gets NaN controls")
 	#println("n = ", n, "z = ", z, "l = ", l, "p = ", p)
