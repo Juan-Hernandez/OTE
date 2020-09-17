@@ -1,6 +1,6 @@
 ## .DS_store
 *.DS_Store
-*/Graphs/*.png
+Graphs/*.png
 testparameters.jl
 Results_DF.csv
 ComparisonOldAndNewAlgorithm.xlsx
