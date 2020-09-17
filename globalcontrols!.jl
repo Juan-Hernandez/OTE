@@ -2,14 +2,7 @@ function globalcontrols!(controls::AbstractArray{T,1}, ss::Array{T,1}, prices::A
 	# INPUT: control vector, state vector and parameters
 	# MODIFIES: control vector
 	debugbool::Bool=false
-# 1.0 Preallocating
-	# corner_nn::T=NaN
-	# corner_zz::T=NaN
-	# corner_ll::T=NaN
-	# corner_pp::T=NaN
-	# corner_hamiltonian::T=NaN
-	# max_hamiltonian::T=-Inf
-# 1.1 Extracting
+# 1.0 Extracting
 	θ::T   =ss[1]
 	e::T   =ss[2]
 	New_A::T =ss[3]
@@ -20,12 +13,12 @@ function globalcontrols!(controls::AbstractArray{T,1}, ss::Array{T,1}, prices::A
 	λ::Float64=prices[1]
 	ω::Float64=prices[2]
 
-# 1.2 Initialize constants ̇
+# 1.1 Initialize constants ̇
 	z_u::T    = (1.0/pa.β)^(1.0/pa.σ)*(1.0 - 1e-10) #Max possible evasion.
 	ln_max::T = 1e10
 	n_full_info::T = (λ*pa.α*e/ω)^(1.0/(1.0-pa.α))
 
-# 1.3 Define aux functions:
+# 1.2 Define aux functions:
 	nfoc(nvar, zvar) = λ*pa.α*e/(1.0-pa.β*zvar^pa.σ)*h_e - ω*nvar^(1.0-pa.α)/(1.0-pa.β*zvar^pa.σ)*h_e-pa.α*New_A;
 	z_opt(nvar)      = pa.σ/λ*nvar^pa.α/h_e*New_A;
 	nfoc_at_zopt(nvar) = nfoc( nvar, z_opt(nvar) );
@@ -37,7 +30,7 @@ den_l = ( λ*pa.χ*h_w - pa.χ/θ*(1.0+pa.ψ)*( μ + New_A) )
 den_l <= 0.0 ? (controls[3]=ln_max*h_w) : (controls[3]=(ω*θ*h_w/den_l)^(1.0/pa.ψ) )
 verbosebool && println("l = ", controls[3], " den_l = ", den_l)
 
-# 2.1 : he = 0
+# 2.1 Case 1: he = 0
 	if h_e<1e-10 # h_e=0.0
 		verbosebool && println("Case 1: h_e=0.0")
 		if New_A < 0.0
@@ -75,8 +68,9 @@ verbosebool && println("l = ", controls[3], " den_l = ", den_l)
 		return nothing
 	end
 
-# Case 3: New_A = (Ve*he+ϕe)/̇ue > 0
+# 2.3 Case 3: New_A = (Ve*he+ϕe)/̇ue > 0
 	verbosebool && println("Case 3: (Ve*he+ϕe)/̇ue > 0.")
+	# 2.3.1 We find an interior solution for n and z:
 	# Using bisection method to find the value of n:
 	if nfoc_at_zopt(pa.ς)*nfoc_at_zopt(n_full_info)<0
 		controls[1] = find_zero(nfoc_at_zopt, (pa.ς,n_full_info), Bisection());
@@ -86,47 +80,12 @@ verbosebool && println("l = ", controls[3], " den_l = ", den_l)
 		z_candidate3 = e*controls[1]^pa.α - ω/λ*(controls[1]-pa.ς)
 		controls[2]  = min(z_candidate1, z_candidate2, z_candidate3)
 		controls[4] = (pa.χ*controls[3]^(1.0+pa.ψ))/den_p(controls[1],controls[2])
-
-		#max_hamiltonian = objective(controls[3],controls[1],controls[4],controls[2]) + 1e-6
-		#verbosebool && println("Interior Hamiltonian = ", max_hamiltonian)
 	else
-		#println("nfoc(pa.ς): ", nfoc_at_zopt(pa.ς), " nfoc(n_full_info): ", nfoc_at_zopt(n_full_info) )
-		#println("Bisection: signs equal solving an interior n --> Cannot solve.")
-
-		# 2.2.2 We evaluate the corner solution for n = ̄m:
+		# 2.3.2 We evaluate the corner solution for n = ̄m:
 			controls[1] = pa.ς
 			controls[2] = z_opt(controls[1])
 			controls[4] = (pa.χ*controls[3]^(1.0+pa.ψ))/den_p(controls[1],controls[2]);
-
-			#corner_hamiltonian = objective(controls[3],corner_nn,corner_pp,corner_zz)
-			#verbosebool && println("Corner1 Hamiltonian = ", corner_hamiltonian)
-		# # 2.2.3 Keep best solution:
-		# 	if corner_hamiltonian > max_hamiltonian
-		# 		verbosebool && println("Case 3.b Corner n and z interior.")
-		# 			controls[1]=corner_nn
-		# 			controls[2]=corner_zz
-		# 			controls[4]=corner_pp
-		# 			max_hamiltonian=corner_hamiltonian
-		# 	end
 	end
-
-# # 2.2.4 We evaluate the corner solution for n = ̄n_full_info:
-# 	#This case should never hold and be the solution.
-# 	corner_nn = n_full_info
-# 	corner_zz = z_opt(n_full_info)
-# 	corner_pp = (pa.χ*controls[3]^(1.0+pa.ψ))/den_p(corner_nn,corner_zz);
-#
-# 	corner_hamiltonian = objective(controls[3],corner_nn,corner_pp,corner_zz)
-# 	verbosebool && println("Corner2 Hamiltonian = ", corner_hamiltonian)
-# # 2.2.5 Keep best solution:
-# 	if corner_hamiltonian > max_hamiltonian
-# 		verbosebool && println("Case 3.c Corner n (n full info) and z interior.")
-# 			controls[1]=corner_nn
-# 			controls[2]=corner_zz
-# 			controls[4]=corner_pp
-# 			max_hamiltonian=corner_hamiltonian
-# 			@warn("Case 3.c Corner n (n full info) and z interior.")
-# 	end
 
 	verbosebool && println("n = ", ForwardDiff.value(controls[1]),
 							",  z = ", ForwardDiff.value(controls[2]),

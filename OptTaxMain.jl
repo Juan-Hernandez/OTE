@@ -7,7 +7,7 @@
 # To run inside a module, run OptTaxModule
 
 # 0 Output switches
-fig_graphs = false # Indicator to print figures (true is when we print figures).
+fig_graphs = true # Indicator to print figures (true is when we print figures).
 fig_graphs && (fig_main = true) # Indicator for main figures.
 fig_graphs && (fig_GloAndEnt = true) # Indicator for figures of both problems.
 fig_graphs && (fig_debug = true) # Indicator for debug figures.
@@ -20,8 +20,8 @@ include("OTEutils.jl")
 
 # 2 Set parameters and initialize
 include("testparameters.jl")
-#include("testparametersRawlsianUniform.jl")
-#include("testparametersUtilitarianUniform.jl")
+#include("ParametersRawlsianUniform.jl")
+#include("ParametersUtilitarianUniform.jl")
 
 	# This defines:
 		# Parameter structures:	ecopar compar dispar

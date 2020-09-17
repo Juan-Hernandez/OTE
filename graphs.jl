@@ -102,7 +102,7 @@ function graphs_MainGlobal(data::DataFrame, dir::AbstractString)
 	savefig("MarginalTaxesMainGlobal.png")
 
 	cd(original_dir) #To get back to the oroginal directory
-end
+end #end function
 
 function graphs_MainGloAndEnt(data::DataFrame, dir::AbstractString)
 #This is the function that makes the graphs for the global and entrepreneurs problem.
@@ -186,7 +186,7 @@ function graphs_MainGloAndEnt(data::DataFrame, dir::AbstractString)
 	savefig("MarginalTaxesMainGloAndEnt.png")
 
 	cd(original_dir) #To get back to the oroginal directory
-end
+end #end function
 
 function graphs_debug(data::DataFrame, dir::AbstractString)
 #This is the function that makes the graphs for the debuging.
@@ -277,7 +277,7 @@ function graphs_debug(data::DataFrame, dir::AbstractString)
 	savefig("Propositions_Debug.png")
 
 	cd(original_dir) #To get back to the original directory
-end
+end #end function
 
 function graphs_OtherResults(data::DataFrame, dir::AbstractString)
 #This is the function that makes the graphs for the other results (includes the
@@ -364,4 +364,4 @@ function graphs_OtherResults(data::DataFrame, dir::AbstractString)
 	savefig("TaxesLiabilities.png")
 
 	cd(original_dir) #To get back to the oroginal directory
-end
+end #end function

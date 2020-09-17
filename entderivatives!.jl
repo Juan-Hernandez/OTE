@@ -13,7 +13,7 @@ function entderivatives!(du,u,pa,e)
 
 # 2. Construct state object
 	vv = [e, uu, μ, h_e]
-	# println(ForwardDiff.value.(vv))
+	#println("he = ", h_e, ", vv = ", ForwardDiff.value.(vv))
 	# println(isa(e,Float64),isa(uu,Float64),isa(μ,Float64),isa(h_e,Float64))
 	# println(isa(vv[1],Float64),isa(vv[2],Float64),isa(vv[3],Float64),isa(vv[4],Float64))
 # 3. Find optimal controls

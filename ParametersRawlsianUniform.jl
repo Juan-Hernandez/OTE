@@ -25,18 +25,20 @@ ecopar=EconomicParameters(
 	)	# Close constructor call
 
 # 2. Distribution parameters: These are the parameters for a uniform distribution.
-# 2.1 Distribution moments
+# 2.1 Type of distribution
+uniform = true	# ::Bool	# Indicator of uniform distributions.
+# 2.2 Distribution moments
 μ_w=10.0	# ::Float64	# Mean of worker's ability
 μ_e=10.0	# ::Float64	# Mean of entrepreneur's ability
 σ2_w=6.0	# ::Float64	# Variance of worker's ability
 σ2_e=6.0	# ::Float64	# Varaince of entrepreneur's ability
 σ_we=0.0	# ::Float64	# Covariance of abilities.
-# 2.2 Distribution support
+# 2.3 Distribution support
 θ_w_l=μ_w-((12.0^0.5)/2.0)*(σ2_w^0.5)	# ::Float64	# Lower bound of worker's ability
 θ_w_u=μ_w+((12.0^0.5)/2.0)*(σ2_w^0.5)	# ::Float64	# Upper bound of worker's ability
 θ_e_l=μ_e-((12.0^0.5)/2.0)*(σ2_e^0.5)	# ::Float64	# Lower bound of entrepreneurs's ability
 θ_e_u=μ_e+((12.0^0.5)/2.0)*(σ2_e^0.5)	# ::Float64	# Upper bound of entrepreneurs's ability
-# 2.3 Constructor call
+# 2.4 Constructor call
 dispar=DistributionParameters(uniform, μ_w, μ_e, σ2_w, σ2_e, σ_we, θ_w_l, θ_w_u, θ_e_l, θ_e_u )
 
 # 3. Computation parameters
