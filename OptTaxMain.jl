@@ -9,9 +9,9 @@
 # 0 Output switches
 fig_graphs = true # Indicator to print figures (true is when we print figures).
 fig_graphs && (fig_main = true) # Indicator for main figures.
-fig_graphs && (fig_GloAndEnt = true) # Indicator for figures of both problems.
-fig_graphs && (fig_debug = true) # Indicator for debug figures.
-fig_graphs && (fig_others = true) # Indicator for debug figures.
+fig_graphs && (fig_GloAndEnt = false) # Indicator for figures of both problems.
+fig_graphs && (fig_debug = false) # Indicator for debug figures.
+fig_graphs && (fig_others = false) # Indicator for debug figures.
 export_results = true #Indicator to export the results dataframe to excel.
 
 # 1 Load packages definitions and functions
@@ -19,8 +19,8 @@ include("OTEutils.jl")
 
 # 2 Set parameters and initialize
 include("testparameters.jl")
-include("ParametersRawlsianUniform.jl") #Parameters for Rawlsian Uniform.
-include("ParametersUtilitarianUniform.jl") #Parameters for Utilitarian Uniform.
+#include("ParametersRawlsianUniform.jl") #Parameters for Rawlsian Uniform.
+#include("ParametersUtilitarianUniform.jl") #Parameters for Utilitarian Uniform.
 	# This defines:
 		# Parameter structures:	ecopar compar dispar
 		# Initial guesses: 		priceguess finalguess
