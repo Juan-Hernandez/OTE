@@ -26,7 +26,7 @@ function modeldata(model::OTEmodel,lenght_sol::Int64)
 	controls_full = Array{Float64,2}(undef,fullsize,2); #The matrix for controls full information
 	debug = Array{Float64,2}(undef,fullsize,7); #The matrix for debug
 	Propositions = Array{Float64}(undef,fullsize,7) #Order: Proposition 1, Proposition 2, Proposition 3
-	FOCs = Array{Float64}(undef,fullsize,3)
+	FOCs = Array{Float64}(undef,fullsize,4)
 	for i in [MarginalTaxes,taxliabilities,controls_full,debug,Propositions,FOCs]
 		fill!(i,NaN);
 	end #end for
@@ -36,7 +36,6 @@ function modeldata(model::OTEmodel,lenght_sol::Int64)
 		# 1.1 Productivities and States:
 		θw  = model.states[1,i]
 		e 	= model.states[2,i]
-		ϕe	= model.states[3,i]
 		u	= model.states[4,i]
 		μ	= model.states[5,i]
 		L	= model.states[6,i]
@@ -52,36 +51,18 @@ function modeldata(model::OTEmodel,lenght_sol::Int64)
 		MarginalTaxes[i,3] = ( θw*ω-λ*χ*l^ψ )/(θw*ω) #Tl'
 		# 1.4 Values for the planner:
 		Vw = (utilit*u^ϕ - λ*u) + ω*l*θw - λ*χ/(1.0+ψ)*l^(1.0+ψ);
-        Ve = (utilit*u^ϕ - λ*u) + λ*e*n^α - λ*β/(1.0+σ)*z^(1.0+σ) - ω*( n-ς );
+        Ve =  utilit*u^ϕ + λ*( e*n^α - β/(1.0+σ)*z^(1.0+σ) - u ) - ω*( n-ς );
+		ϕe = model.states[3,i]*( n^α*(1.0-β*z^σ) ) - Ve*model.modist.he(θw, e);
+		FOCs[i,4] = model.states[3,i]
+		model.states[3,i] = ϕe
 
 		# 1.4 Taxes Liabilities (also includes the tax base):
 			# 1.4.1 Tax bases (Recall that for Tc we need to have the value of Tn):
 			taxliabilities[i,1] = ω*( n-ς ) #Tn
 			taxliabilities[i,3] = θw*ω*l #Tl
 			# 1.4.2 Tax liabilities (Recall that for Tc we need to have the value of Tn):
-			# We get the value of Tl from the definition of uw, we solve Tn and Tc through integrals
+			# We get the value of Tl from the definition of uw, we solve Tn and Tc through integrals (in the next section as we integrate backwards):
 			taxliabilities[i,6] = θw*ω/λ*l - χ/(1.0+ψ)*l^(1.0+ψ) - u #Tl
-			if i == first_sol_Global
-				#This is the first value for the integral
-				taxliabilities[i,4] = 0.0 #Tn
-				taxliabilities[i,5] = e*n^α - ω/λ*(n -ς) - β/(1.0+σ)*z^(1.0-σ) - u #Tc
-				#We give the value of the base for Tc:
-				taxliabilities[i,2] = e*n^α - ω*( n-ς ) - taxliabilities[i,4] - z #Tc
-			else
-				# Get the values of the integrals:
-				for j in [1,2] #We are solving for Tn, and Tc.
-					if j == 2 #This is the tax base for Tc
-						taxliabilities[i,2] = e*n^α - ω*( n-ς ) - taxliabilities[i,4] - z #Tc
-					end #end if
-					#We are solving the integrals with the trapezoidal rule.
-					previous_sol = taxliabilities[i-1,j+3]
-					average_functions = (MarginalTaxes[i-1,j]+MarginalTaxes[i,j])/2.0
-					distance_interval = (taxliabilities[i,j]-taxliabilities[i-1,j])
-					sol_int      = NaN
-					sol_int      = previous_sol + average_functions*distance_interval;
-					taxliabilities[i,j+3] = sol_int
-				end #end for
-			end #end if
 
 		#1.5 Propositions: Here we put the information for the things we don't need to integrate
 		# 1.5.1 The first proposition:
@@ -119,8 +100,39 @@ function modeldata(model::OTEmodel,lenght_sol::Int64)
 		FOCs[i,3] = l^ψ*( χ/θw*(1.0+ψ)*μ - λ*χ*debug[i,1] ) + ω*θw*debug[i,1] + (1.0+ψ)*p/l*debug[i,2]*( λ*e*n^α - ω*n - λ*β/(1.0+σ)*z^(1.0+σ) + debug[i,5] )
 	end # end for
 
-	#Now we solve the integrals in reverse
-	#We now get the value of the integral for the entrepreneurs'problem in proposition 3
+	#Now we solve the integrals in reverse:
+	# 1. Taxes Liabilities (also includes the tax base) for Tn and Tc:
+	for i in fullsize:-1:first_sol_Global
+		# 1.1 Productivities and States:
+		e 	= model.states[2,i]
+		u	= model.states[4,i]
+		# 1.2 Controls:
+		n	= model.controls[1,i]
+		z	= model.controls[2,i]
+		if i == fullsize
+			#This is the first value for the integral (tax liability):
+			taxliabilities[i,4] = 0.0 #Tn
+			taxliabilities[i,5] = e*n^α - ω/λ*(n -ς) - β/(1.0+σ)*z^(1.0+σ) - u #Tc
+			#We give the value of the base for Tc:
+			taxliabilities[i,2] = e*n^α - ω*( n-ς ) - taxliabilities[i,4] - z #Tc
+		else
+			# Get the values of the integrals:
+			for j in [1,2] #We are solving for Tn, and Tc.
+				if j == 2 #This is the tax base for Tc
+					taxliabilities[i,2] = e*n^α - ω*( n-ς ) - taxliabilities[i,4] - z #Tc
+				end #end if
+				#We are solving the integrals with the trapezoidal rule.
+				previous_sol = taxliabilities[i+1,j+3]
+				average_functions = (MarginalTaxes[i,j]+MarginalTaxes[i+1,j])/2.0
+				distance_interval = (taxliabilities[i,j]-taxliabilities[i+1,j]) #Difference in tax bases.
+				sol_int      = NaN
+				sol_int      = previous_sol - average_functions*distance_interval;
+				taxliabilities[i,j+3] = sol_int
+			end #end for
+		end #end if
+	end #end for
+
+	# 2. We now get the value of the integral for the entrepreneurs'problem in proposition 3:
 	for i in fullsize:-1:globalsize+1
 		if i == fullsize
 			#This is the first value for the integral
@@ -178,7 +190,8 @@ function modeldata(model::OTEmodel,lenght_sol::Int64)
 							[:θw, :θe, :ϕe, :u, :μ, :L, :Y, :n, :z, :l, :p, :Tn′, :Tc′, :Tl′,
 							:baseTn, :baseTc, :baseTl, :Tn, :Tc, :Tl, :Prop1LSDebug, :Prop1RS1, :Prop1RS2,
 							:Prop2LS1, :Prop2RS1, :Prop3LS2, :Prop3RS1, :nfull, :lfull,
-							:hw, :he, :uw′, :ue′, :A, :Afull, :MaxEvasion, :FOCn, :FOCz, :FOCl] )
+							:hw, :he, :uw′, :ue′, :A, :Afull, :MaxEvasion, :FOCn, :FOCz, :FOCl, :NewState] )
+
 	Results_DF = Results_DF[first_sol_Global:fullsize,:]
 	return Results_DF
 
