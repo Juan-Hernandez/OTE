@@ -81,27 +81,42 @@ function graphs_MainGlobal(data::DataFrame, dir::AbstractString)
 	fig, margtax=plt.subplots(2,3)
 	fig.suptitle("Marginal Taxes")
 		#τ_n_prime:
-	margtax[1,1].plot(data[1:globalsize,:].:θw, data[1:globalsize,:].:Tn′)
-	margtax[1,1].set(ylabel="τ_n'", xlabel="θw")
+	margtax[1,1].plot(data.:θe, data.:Tn′)
+	margtax[1,1].set(ylabel="τn'", xlabel="θe")
 		#τ_c_prime:
-	margtax[1,2].plot(data[1:globalsize,:].:θw, data[1:globalsize,:].:Tc′)
-	margtax[1,2].set(ylabel="τ_c'", xlabel="θw")
+	margtax[1,2].plot(data.:θe, data.:Tc′)
+	margtax[1,2].set(ylabel="τc'", xlabel="θe")
 		#τ_l_prime:
 	margtax[1,3].plot(data[1:globalsize,:].:θw, data[1:globalsize,:].:Tl′)
-	margtax[1,3].set(ylabel="τ_l'", xlabel="θw")
+	margtax[1,3].set(ylabel="τl'", xlabel="θw")
 		#τ_n:
-	margtax[2,1].plot(data[1:globalsize,:].:baseTn, data[1:globalsize,:].:Tn′)
-	margtax[2,1].set(ylabel="τ_n'", xlabel="ω n")
+	margtax[2,1].plot(data.:baseTn, data.:Tn′)
+	margtax[2,1].set(ylabel="τn'", xlabel="ω n")
 		#τ_c:
-	margtax[2,2].plot(data[1:globalsize,:].:baseTc, data[1:globalsize,:].:Tc′)
-	margtax[2,2].set(ylabel="τ_c'", xlabel="e*n^α- ω*(n - ̅m) -Tn -z")
+	margtax[2,2].plot(data.:baseTc, data.:Tc′)
+	margtax[2,2].set(ylabel="τc'", xlabel="e*n^α- ω*(n - ̅m) -Tn -z")
 		#τ_l:
 	margtax[2,3].plot(data[1:globalsize,:].:baseTl, data[1:globalsize,:].:Tl′)
-	margtax[2,3].set(ylabel="τ_l'", xlabel="θw l ω")
+	margtax[2,3].set(ylabel="τl'", xlabel="θw*l*ω")
 
 	savefig("MarginalTaxesMainGlobal.png")
 
-	cd(original_dir) #To get back to the oroginal directory
+# 4. Graphs for the tax bases:
+	fig, taxbases = plt.subplots(1,3)
+	fig.suptitle("Tax bases")
+		#Income tax:
+	taxbases[1].plot(data[1:globalsize,:].:θw, data[1:globalsize,:].:baseTl)
+	taxbases[1].set(ylabel="θw*ω*l", xlabel="θw")
+		#Payroll tax:
+	taxbases[2].plot(data.:θe, data.:baseTn)
+	taxbases[2].set(ylabel="ω/λ*(n-̅m)", xlabel="θe")
+		#Corporate tax:
+	taxbases[3].plot(data.:θe, data.:baseTc)
+	taxbases[3].set(ylabel="θe*n^α - ω/λ*(n-̅m) - Tn - z", xlabel="θe")
+
+	savefig("TaxBasesMainGlobal.png")
+
+	cd(original_dir) #To get back to the original directory
 end #end function
 
 function graphs_MainGloAndEnt(data::DataFrame, dir::AbstractString)
@@ -172,20 +187,32 @@ function graphs_MainGloAndEnt(data::DataFrame, dir::AbstractString)
 	fig.suptitle("Marginal Taxes")
 		#τ_n_prime:
 	margtax[1,1].plot(data.:θe, data.:Tn′)
-	margtax[1,1].set(ylabel="τ_n'", xlabel="θe")
+	margtax[1,1].set(ylabel="τn'", xlabel="θe")
 		#τ_c_prime:
 	margtax[1,2].plot(data.:θe, data.:Tc′)
-	margtax[1,2].set(ylabel="τ_c'", xlabel="θe")
+	margtax[1,2].set(ylabel="τc'", xlabel="θe")
 		#τ_n:
 	margtax[2,1].plot(data.:baseTn, data.:Tn′)
-	margtax[2,1].set(ylabel="T_n", xlabel="ω n")
+	margtax[2,1].set(ylabel="Tn", xlabel="ω n")
 		#τ_c:
 	margtax[2,2].plot(data.:baseTc, data.:Tc′)
-	margtax[2,2].set(ylabel="T_c", xlabel="e*n^α- ω*(n-̅m) - Tn -z")
+	margtax[2,2].set(ylabel="Tc", xlabel="e*n^α- ω*(n-̅m) - Tn -z")
 
 	savefig("MarginalTaxesMainGloAndEnt.png")
 
-	cd(original_dir) #To get back to the oroginal directory
+# 4. Graphs for the tax bases:
+	fig, taxbases = plt.subplots(1,2)
+	fig.suptitle("Tax bases")
+		#Payroll taxes:
+	taxbases[1].plot(data.:θe, data.:baseTn)
+	taxbases[1].set(ylabel="ω/λ*(n-̅m)", xlabel="θe")
+		#Corporate taxes:
+	taxbases[2].plot(data.:θe, data.:baseTc)
+	taxbases[2].set(ylabel="θe*n^α - ω/λ*(n-̅m) - Tn - z", xlabel="θe")
+
+	savefig("TaxBasesMainGloAndEnt.png")
+
+	cd(original_dir) #To get back to the original directory
 end #end function
 
 function graphs_debug(data::DataFrame, dir::AbstractString)
@@ -327,41 +354,41 @@ function graphs_OtherResults(data::DataFrame, dir::AbstractString)
 	fig, tax=plt.subplots(2,3)
 	fig.suptitle("Taxes Global Problem")
 		#τ_n:
-	tax[1,1].plot(data[1:globalsize,:].:θw, data[1:globalsize,:].:Tn)
-	tax[1,1].set(ylabel="T_c", xlabel="e")
+	tax[1,1].plot(data.:θe, data.:Tn)
+	tax[1,1].set(ylabel="Tn", xlabel="θe")
 		#τ_c:
-	tax[1,2].plot(data[1:globalsize,:].:θw, data[1:globalsize,:].:Tc)
-	tax[1,2].set(ylabel="T_n", xlabel="e")
+	tax[1,2].plot(data.:θe, data.:Tc)
+	tax[1,2].set(ylabel="Tc", xlabel="θe")
 		#τ_l:
 	tax[1,3].plot(data[1:globalsize,:].:θw, data[1:globalsize,:].:Tl)
-	tax[1,3].set(ylabel="T_l", xlabel="θw")
+	tax[1,3].set(ylabel="Tl", xlabel="θw")
 		#τ_n:
-	tax[2,1].plot(data[1:globalsize,:].:baseTn, data[1:globalsize,:].:Tn)
-	tax[2,1].set(ylabel="T_n", xlabel="ω n")
+	tax[2,1].plot(data.:baseTn, data.:Tn)
+	tax[2,1].set(ylabel="Tn", xlabel="ω*(n-̅m)")
 		#τ_c:
-	tax[2,2].plot(data[1:globalsize,:].:baseTc, data[1:globalsize,:].:Tc)
-	tax[2,2].set(ylabel="T_c", xlabel="e*n^α- ω n-Tn -z")
+	tax[2,2].plot(data.:baseTc, data.:Tc)
+	tax[2,2].set(ylabel="Tc", xlabel="e*n^α- ω*(n-̅m)- Tn -z")
 		#τ_l:
 	tax[2,3].plot(data[1:globalsize,:].:baseTl, data[1:globalsize,:].:Tl)
-	tax[2,3].set(ylabel="T_l", xlabel="θw l ω")
+	tax[2,3].set(ylabel="Tl", xlabel="θw*l*ω")
 
 	#Taxes liabilities in Entrepreneurs Problem:
 	fig, tax_ent=plt.subplots(2,2)
 	fig.suptitle("Taxes Entrepreneurs Problem")
 		#τ_c:
 	tax_ent[1,1].plot(data[globalsize:fullsize,:].:θe, data[globalsize:fullsize,:].:Tn)
-	tax_ent[1,1].set(ylabel="T_n", xlabel="θe")
+	tax_ent[1,1].set(ylabel="Tn", xlabel="θe")
 		#τ_n:
 	tax_ent[1,2].plot(data[globalsize:fullsize,:].:θe, data[globalsize:fullsize,:].:Tc)
-	tax_ent[1,2].set(ylabel="T_c", xlabel="θe")
+	tax_ent[1,2].set(ylabel="Tc", xlabel="θe")
 		#τ_n:
 	tax_ent[2,1].plot(data[globalsize:fullsize,:].:baseTn, data[globalsize:fullsize,:].:Tn)
-	tax_ent[2,1].set(ylabel="T_n", xlabel="ωe n")
+	tax_ent[2,1].set(ylabel="Tn", xlabel="ωe*(n-̅m)")
 		#τ_n:
 	tax_ent[2,2].plot(data[globalsize:fullsize,:].:baseTc, data[globalsize:fullsize,:].:Tc)
-	tax_ent[2,2].set(ylabel="T_c", xlabel="θe*n^α- ωe n-Tn-z")
+	tax_ent[2,2].set(ylabel="Tc", xlabel="θe*n^α- ωe*(n-̅m)-Tn-z")
 
 	savefig("TaxesLiabilities.png")
 
-	cd(original_dir) #To get back to the oroginal directory
+	cd(original_dir) #To get back to the original directory
 end #end function

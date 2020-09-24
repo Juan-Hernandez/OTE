@@ -60,7 +60,7 @@ compar=ComputationParameters(
 ω_bar	=   1.34318
 priceguess= [λ_bar, ω_bar]
 # 4.2 Guess for final states
-u_u		=   640.7
+u_u		=   656.7
 ew_u	=   dispar.θ_e_u*(1.0-0.007)
 New_State_u	=	NaN # Ve*he @ ew_u (filled after entrepreneurs' problem)
 μ_u		=   0.0 # Fixed

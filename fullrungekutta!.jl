@@ -87,9 +87,13 @@ function fullrungekutta!(model::OTEmodel)
 
 # 4. Print initial state for boundary conditions
 	Ve_first= Ve(model.controls[1:2,firstind]..., e, model.states[4,firstind])
-	display(model.states[:,firstind])
-	display(model.controls[:,firstind])
-	println("Ve*he+phi: ", Ve_first*h_e+model.states[3,firstind] )
+	println("θw = ", model.states[1,firstind], ". Model States: θe = ", model.states[2,firstind], ", ϕe = ", model.states[3,firstind],
+			", u = ", model.states[4,firstind], ", μ = ", model.states[5,firstind], ", L = ", model.states[6,firstind],
+			", Y = ", model.states[7,firstind] )
+	println("Controls: n = ", model.controls[1,firstind], ", z = ", model.controls[2,firstind],
+			", l = ", model.controls[3,firstind], ", p = ", model.controls[4,firstind])
+	println("Prices: λ = ", model.prices[1], ", ω = ", model.prices[2])
+	println("Ve*he+phi = ", Ve_first*h_e+model.states[3,firstind] )
 	return lenght_sol
 end
 
